@@ -3,25 +3,33 @@ import { Button, Container, Grid, Paper, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Box, Stack } from "@mui/system";
 
-function App() {
-  const values = {
+function App({
+  values = {
     name: "Denmark",
     hobbies: [],
-  };
-
+  },
+}) {
   const [index, setIndex] = React.useState(Object.keys(values.hobbies));
 
-  const { register, handleSubmit } = useForm();
-  const onSubmit = (data) =>
-    console.log({ ...data, hobbies: Object.values(data.hobbies) });
+  const { register, handleSubmit } = useForm({
+    mode: "all",
+    reValidateMode: "all",
+    defaultValues: values,
+  });
 
   const removeField = (indx) => {
-    setIndex(index.filter((i) => i !== indx));
+    setIndex(index.filter((i) => indx !== i));
   };
 
   const addField = () => {
     setIndex([...index, index.length + 1]);
   };
+
+  const onSubmit = (data) =>
+    console.log({
+      name: data.values.name,
+      hobbies: Object.values(data.hobbies),
+    });
 
   return (
     <Grid
@@ -45,20 +53,23 @@ function App() {
             </Button>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={2} direction={"column"}>
-                <TextField defaultValue={values.name} {...register("name")} />
+                <TextField
+                  defaultValue={values.name}
+                  {...register(`values.name`)}
+                />
                 <strong>Hobbies:</strong>
+
                 {index.map((ind) => (
-                  <Container key={`form:${ind}`}>
+                  <Container key={ind}>
                     <Stack padding={2} direction={"row"}>
                       <TextField
                         fullWidth
-                        {...register(`values[${ind}].hobbies`, {
+                        {...register(`hobbies[${ind}].desc`, {
                           required: true,
                         })}
                       />
-                      <Button onClick={() => removeField(ind)}>
-                        Remove Field
-                      </Button>
+
+                      <Button onClick={() => removeField(ind)}>Delete</Button>
                     </Stack>
                   </Container>
                 ))}
